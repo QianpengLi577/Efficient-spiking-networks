@@ -3,7 +3,8 @@ this code works,
 1. 36 recurrent neurons will lead to 84.4 percent on testset
 2. 24 recurrent neurons will lead to 81.8 percent on testset
 """
-
+import os
+os.environ["CUDA_VISIBLE_DEVICES"]="-1" ###指定此处为-1即可
 import torch
 import torch.nn as nn
 import torchvision.transforms as transforms
@@ -20,8 +21,8 @@ from datetime import datetime
 from sklearn.metrics import confusion_matrix
 import scipy.io
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-# device =  torch.device("cpu")
+# device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+device =  torch.device("cpu")
 print('device: ',device)
 
 '''
@@ -75,8 +76,8 @@ act_fun_adp = ActFun_adp.apply
 
 if neuron_type =='adaptive':
     def mem_update_adp(inputs, mem, spike, tau_m,tau_adp, b, isAdapt=1, dt=1):
-        alpha = torch.exp(-1. * dt / tau_m).cuda()
-        ro = torch.exp(-1. * dt / tau_adp).cuda()
+        alpha = torch.exp(-1. * dt / tau_m).cpu()
+        ro = torch.exp(-1. * dt / tau_adp).cpu()
         # tau_adp is tau_adaptative which is learnable # add requiregredients
         if isAdapt:
             beta = 1.8
@@ -140,9 +141,9 @@ class RNN_s(nn.Module):
         total_spikes = 0
         # Feed in the whole sequence
         batch_size, seq_num, input_dim = input.shape
-        hidden_mem = hidden_spike = (torch.rand(batch_size, self.hidden_size)*b_j0).cuda()
-        output_mem = output_spike = out_spike = (torch.rand(batch_size, self.output_size)*b_j0).cuda()
-        output_spike_sum = torch.zeros(batch_size,seq_num, self.output_size).cuda()
+        hidden_mem = hidden_spike = (torch.rand(batch_size, self.hidden_size)*b_j0).cpu()
+        output_mem = output_spike = out_spike = (torch.rand(batch_size, self.output_size)*b_j0).cpu()
+        output_spike_sum = torch.zeros(batch_size,seq_num, self.output_size).cpu()
         self.b_h = self.b_o = 0.01
 
         max_iters = 1301
@@ -335,7 +336,7 @@ if __name__ == '__main__':
     n_iters = 300000
     lens = 0.5  # hyper-parameters of approximate function
     #num_epochs = 1#250  # n_iters / (len(train_dataset) / batch_size)
-    num_epochs = 0#400 #400
+    num_epochs = 400#400 #400
     #nb_of_batch = nb_of_sample // batch_size
 
     sub_seq_length = 10
@@ -387,12 +388,12 @@ if __name__ == '__main__':
     # test and visualization
     test_seq_dim = test_x.shape[1]
     
-    tau_adp_o = model.tau_adp_o.detach().cpu().numpy()
-    plt.plot(tau_adp_o)
-    plt.show()
-    tau_adp_h = model.tau_adp_h.detach().cpu().numpy()
-    plt.plot(tau_adp_h)
-    plt.show()
+    # tau_adp_o = model.tau_adp_o.detach().cpu().numpy()
+    # plt.plot(tau_adp_o)
+    # plt.show()
+    # tau_adp_h = model.tau_adp_h.detach().cpu().numpy()
+    # plt.plot(tau_adp_h)
+    # plt.show()
 
 
 

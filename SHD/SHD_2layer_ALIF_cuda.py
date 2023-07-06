@@ -92,8 +92,8 @@ act_fun_adp = ActFun_adp.apply
 # tau_m = torch.FloatTensor([tau_m])
 
 def mem_update_adp(inputs, mem, spike, tau_adp, b, tau_m, dt=1, isAdapt=1):
-    alpha = torch.exp(-1. * dt / tau_m).cpu()
-    ro = torch.exp(-1. * dt / tau_adp).cpu()
+    alpha = torch.exp(-1. * dt / tau_m).cuda()
+    ro = torch.exp(-1. * dt / tau_adp).cuda()
     if isAdapt:
         beta = 1.8
     else:
@@ -113,7 +113,7 @@ def output_Neuron(inputs, mem, tau_m, dt=1):
     The read out neuron is leaky integrator without spike
     """
     # alpha = torch.exp(-1. * dt / torch.FloatTensor([30.])).cuda()
-    alpha = torch.exp(-1. * dt / tau_m).cpu()
+    alpha = torch.exp(-1. * dt / tau_m).cuda()
     mem = mem * alpha + (1. - alpha) * R_m * inputs
     return mem
 
@@ -167,11 +167,11 @@ class RNN_custom(nn.Module):
         self.b_h1 = self.b_h2 = self.b_o = b_j0
         # mem_layer1 = spike_layer1 = torch.zeros(batch_size, self.hidden_size[0]).cuda()
         # mem_layer2 = spike_layer2 = torch.zeros(batch_size, self.hidden_size[1]).cuda()
-        mem_layer1 = torch.rand(batch_size, self.hidden_size[0]).cpu()
-        mem_layer2 = torch.rand(batch_size, self.hidden_size[1]).cpu()
+        mem_layer1 = torch.rand(batch_size, self.hidden_size[0]).cuda()
+        mem_layer2 = torch.rand(batch_size, self.hidden_size[1]).cuda()
 
-        spike_layer1 = torch.zeros(batch_size, self.hidden_size[0]).cpu()
-        spike_layer2 = torch.zeros(batch_size, self.hidden_size[1]).cpu()
+        spike_layer1 = torch.zeros(batch_size, self.hidden_size[0]).cuda()
+        spike_layer2 = torch.zeros(batch_size, self.hidden_size[1]).cuda()
         mem_output = torch.rand(batch_size, output_dim).cpu()
         output = torch.zeros(batch_size, output_dim).cpu()
 
